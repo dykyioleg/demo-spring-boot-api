@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+>
+
+    <changeSet author="Oleg" id="demo-00">
+        <sql>
+            CREATE SCHEMA IF NOT EXISTS demo;
+        </sql>
+    </changeSet>
+
+    <changeSet author="Oleg" id="demo-01">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="main_issue"/>
+            </not>
+        </preConditions>
+        <createTable tableName="main_issue" schemaName="demo">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true"
+                             primaryKeyName="main_issue_pkey"/>
+            </column>
+            <column name="version" type="BIGINT"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reportable" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="description" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Oleg" id="demo-02">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="defect"/>
+            </not>
+        </preConditions>
+        <createTable tableName="defect" schemaName="demo">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true"
+                             primaryKeyName="defect_pkey"/>
+            </column>
+            <column name="version" type="BIGINT"/>
+            <column name="created" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="main_issue_id" type="UUID">
+                <constraints
+                        nullable="false"
+                        foreignKeyName="fk_defect_main_issue_id"
+                        references="demo.main_issue(id)"
+                />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

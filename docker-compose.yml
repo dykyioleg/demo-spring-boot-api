@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      TZ: CET
+      POSTGRES_DB: demo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: XlQIppEarQ6
+    healthcheck:
+      # https://marc.info/?l=postgresql-general&m=138488483804329&w=2
+      test: [ "CMD-SHELL", "pg_isready --dbname=postgresql://localhost:5432/demo" ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
