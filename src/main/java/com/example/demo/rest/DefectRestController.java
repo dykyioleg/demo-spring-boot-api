@@ -20,6 +20,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * REST controller for managing Defect entities.
+ * <p>
+ * This controller provides CRUD operations for defects with the following features:
+ * <ul>
+ *   <li>Create, Read, Update, and Delete operations for defects</li>
+ *   <li>Association with main issues (each defect must belong to a main issue)</li>
+ *   <li>No authentication required for any operations</li>
+ *   <li>Input validation using Jakarta Bean Validation</li>
+ *   <li>RFC 7807 Problem Details for error responses</li>
+ * </ul>
+ * <p>
+ * Base path: {@code /api/defect}
+ * <p>
+ * Note: Defects are automatically deleted when their parent main issue is deleted (cascade).
+ *
+ * @see DefectService
+ * @see DefectReqDto
+ * @see DefectRespDto
+ * @author Demo Project
+ * @since 1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/defect")

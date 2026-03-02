@@ -21,6 +21,29 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+/**
+ * REST controller for managing Main Issue entities.
+ * <p>
+ * This controller provides CRUD operations for main issues with the following features:
+ * <ul>
+ *   <li>Create, Read, Update, and Delete operations for main issues</li>
+ *   <li>JWT authentication required for POST operations (create new main issue)</li>
+ *   <li>Cascade deletion - deleting a main issue automatically deletes all related defects</li>
+ *   <li>Input validation using Jakarta Bean Validation</li>
+ *   <li>RFC 7807 Problem Details for error responses</li>
+ * </ul>
+ * <p>
+ * Base path: {@code /api/main-issue}
+ * <p>
+ * Authentication: Only POST endpoint requires JWT token with valid issuer and audience claims.
+ * All other endpoints (GET, PUT, DELETE) are publicly accessible.
+ *
+ * @see MainIssueService
+ * @see MainIssueReqDto
+ * @see MainIssueRespDto
+ * @author Demo Project
+ * @since 1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/main-issue")
