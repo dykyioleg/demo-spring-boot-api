@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.mappers.DefectMapper;
 import com.example.demo.mappers.MainIssueMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Bean;
@@ -12,4 +13,6 @@ public class MapperConfig {
 	public MainIssueMapper mainIssueMapper() {
 		return Mappers.getMapper(MainIssueMapper.class);
 	}
+	@Bean
+	public DefectMapper defectMapper() {return Mappers.getMapper(DefectMapper.class);}
 }
