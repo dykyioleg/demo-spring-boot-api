@@ -163,8 +163,6 @@ jwt.public-key=<RSA_PUBLIC_KEY>
 ## Documentation
 
 - **API_DOCS.md** - Complete API documentation
-- **SECURITY_EXPLAINED.md** - Security architecture and how it works
-- **QUICK_REFERENCE.md** - Quick commands and examples
 
 ## Security Architecture
 
