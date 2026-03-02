@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -98,5 +99,34 @@ public class MainIssueControllerTestIT {
                 .andExpect(jsonPath("$.reportable", equalTo(false)));
         MainIssueEntity updatedMainIssue = mainIssueRepository.findById(mainIssue.getId()).get();
         assertThat(updatedMainIssue.getVersion()).isZero();
+    }
+
+    @Test
+    void getMainIssueById() throws Exception {
+        //given
+        MainIssueEntity mainIssue = dataFixture.mainIssue.givenMainIssue("test main issue", true);
+
+        //when
+        this.mockMvc.perform(get("/api/main-issue/{mainIssueId}", mainIssue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(mainIssue.getId().toString())))
+                .andExpect(jsonPath("$.description", equalTo("test main issue")))
+                .andExpect(jsonPath("$.reportable", equalTo(true)));
+    }
+
+    @Test
+    void getMainIssueById_notFound() throws Exception {
+        //given
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        //when
+        this.mockMvc.perform(get("/api/main-issue/{mainIssueId}", nonExistentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isNotFound());
     }
 }

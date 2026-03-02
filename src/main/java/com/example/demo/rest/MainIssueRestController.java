@@ -17,9 +17,9 @@ public class MainIssueRestController {
 
 	private final MainIssueService mainIssueService;
 
-	@GetMapping("/hello")
-	public String helloWorld() {
-		return "Hello world!";
+	@GetMapping("/{mainIssueId}")
+	public MainIssueRespDto getMainIssueById(@PathVariable @NotNull final UUID mainIssueId) {
+		return mainIssueService.getMainIssueById(mainIssueId);
 	}
 
 	@PostMapping

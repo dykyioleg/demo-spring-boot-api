@@ -11,4 +11,6 @@ public interface MainIssueService {
 
     MainIssueRespDto updateMainIssue(UUID mainIssueId, MainIssueReqDto dto);
 
+    MainIssueRespDto getMainIssueById(UUID mainIssueId);
+
 }

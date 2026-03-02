@@ -39,4 +39,11 @@ public class MainIssueServiceImpl implements MainIssueService {
         mainIssueMapper.updateEntityWithReqDto(dto, mainIssue);
         return mainIssueMapper.toDto(mainIssue);
     }
+
+    @Override
+    public MainIssueRespDto getMainIssueById(final UUID mainIssueId) {
+        final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE));
+        return mainIssueMapper.toDto(mainIssue);
+    }
 }
