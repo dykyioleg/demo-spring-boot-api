@@ -20,39 +20,48 @@ import java.util.UUID;
 public class MainIssueServiceImpl implements MainIssueService {
     private static final String NOT_FOUND_MAIN_ISSUE = "Invalid main issue id";
 
+    // Log message constants
+    private static final String LOG_SAVING_MAIN_ISSUE = "Saving new main issue with description: {}";
+    private static final String LOG_SAVED_MAIN_ISSUE = "Successfully saved main issue with id: {}";
+    private static final String LOG_UPDATING_MAIN_ISSUE = "Updating main issue with id: {}";
+    private static final String LOG_UPDATED_MAIN_ISSUE = "Successfully updated main issue with id: {}";
+    private static final String LOG_RETRIEVING_MAIN_ISSUE = "Retrieving main issue with id: {}";
+    private static final String LOG_RETRIEVED_MAIN_ISSUE = "Successfully retrieved main issue with id: {}";
+    private static final String LOG_MAIN_ISSUE_NOT_FOUND = "Main issue not found with id: {}";
+
     private final MainIssueRepository mainIssueRepository;
     private final MainIssueMapper mainIssueMapper;
 
     @Override
     @Transactional(readOnly = false)
     public MainIssueRespDto saveMainIssue(final MainIssueReqDto mainIssueReqDto){
-        log.info("Saving new main issue with description: {}", mainIssueReqDto.getDescription());
+        log.info(LOG_SAVING_MAIN_ISSUE, mainIssueReqDto.getDescription());
         MainIssueEntity mainIssue = mainIssueMapper.toEntity(mainIssueReqDto);
         MainIssueEntity savedMainIssue = mainIssueRepository.saveAndFlush(mainIssue);
-        log.info("Successfully saved main issue with id: {}", savedMainIssue.getId());
+        log.info(LOG_SAVED_MAIN_ISSUE, savedMainIssue.getId());
         return mainIssueMapper.toDto(savedMainIssue);
     }
 
     @Override
     @Transactional(readOnly = false)
     public MainIssueRespDto updateMainIssue(final UUID mainIssueId, final MainIssueReqDto dto) {
-        log.info("Updating main issue with id: {}", mainIssueId);
+        log.info(LOG_UPDATING_MAIN_ISSUE, mainIssueId);
         final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE));
         mainIssueMapper.updateEntityWithReqDto(dto, mainIssue);
-        log.info("Successfully updated main issue with id: {}", mainIssueId);
+        log.info(LOG_UPDATED_MAIN_ISSUE, mainIssueId);
         return mainIssueMapper.toDto(mainIssue);
     }
 
     @Override
     public MainIssueRespDto getMainIssueById(final UUID mainIssueId) {
-        log.info("Retrieving main issue with id: {}", mainIssueId);
+        log.info(LOG_RETRIEVING_MAIN_ISSUE, mainIssueId);
         final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
                 .orElseThrow(() -> {
-                    log.warn("Main issue not found with id: {}", mainIssueId);
+                    log.warn(LOG_MAIN_ISSUE_NOT_FOUND, mainIssueId);
                     return new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE);
                 });
-        log.debug("Successfully retrieved main issue with id: {}", mainIssueId);
+        log.debug(LOG_RETRIEVED_MAIN_ISSUE, mainIssueId);
         return mainIssueMapper.toDto(mainIssue);
     }
 }
