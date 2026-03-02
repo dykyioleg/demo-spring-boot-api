@@ -1,6 +1,6 @@
 package com.example.demo.repositories;
 
-import com.example.demo.TestcontainersConfiguration;
+import com.example.demo.config.TestcontainersConfiguration;
 import com.example.demo.entities.MainIssueEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

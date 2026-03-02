@@ -1,7 +1,8 @@
 package com.example.demo.rest;
 
 import com.example.demo.DemoApplication;
-import com.example.demo.TestcontainersConfiguration;
+import com.example.demo.config.TestcontainersConfiguration;
+import com.example.demo.config.TestSecurityConfig;
 import com.example.demo.entities.DefectEntity;
 import com.example.demo.entities.MainIssueEntity;
 import com.example.demo.repositories.DefectRepository;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,10 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = { DemoApplication.class })
-@Import({ TestcontainersConfiguration.class })
+@Import({ TestcontainersConfiguration.class, TestSecurityConfig.class })
 @AutoConfigureMockMvc
 @AutoConfigureTestEntityManager
 @Transactional
+@ActiveProfiles("test")
 public class DefectControllerTestIT {
 
     private DataFixture dataFixture;

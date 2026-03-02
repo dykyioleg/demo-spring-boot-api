@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -49,14 +50,19 @@ public class MainIssueRestController {
 
 	@Operation(
 			summary = "Create a new Main Issue",
-			description = "Create a new main issue with the provided details"
+			description = "Create a new main issue with the provided details. Requires valid JWT token with correct issuer and audience."
 	)
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "Main issue created successfully",
 					content = @Content(schema = @Schema(implementation = MainIssueRespDto.class))),
 			@ApiResponse(responseCode = "400", description = "Invalid input data",
+					content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+			@ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token",
+					content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+			@ApiResponse(responseCode = "403", description = "Forbidden - Token does not have required permissions",
 					content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
 	})
+	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public MainIssueRespDto saveMainIssue(
 			@io.swagger.v3.oas.annotations.parameters.RequestBody(
