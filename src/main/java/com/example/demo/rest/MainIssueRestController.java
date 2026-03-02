@@ -14,6 +14,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,6 +73,27 @@ public class MainIssueRestController {
 			@PathVariable @NotNull final UUID mainIssueId) {
 		log.info("Received GET request for main issue with id: {}", mainIssueId);
 		return mainIssueService.getMainIssueById(mainIssueId);
+	}
+
+	@Operation(
+			summary = "Get all Main Issues with Pagination",
+			description = "Retrieve all main issues with pagination and sorting support. " +
+					"Default page size is 20, sorted by creation date in descending order. " +
+					"Example: GET /api/main-issue?page=0&size=10&sort=created,desc"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Main issues retrieved successfully",
+					content = @Content(schema = @Schema(implementation = Page.class)))
+	})
+	@GetMapping
+	public Page<MainIssueRespDto> getAllMainIssues(
+			@Parameter(description = "Pagination parameters (page, size, sort)",
+					example = "page=0&size=20&sort=created,desc")
+			@PageableDefault(size = 20, sort = "created", direction = Sort.Direction.DESC)
+			Pageable pageable) {
+		log.info("Received GET request for all main issues with pagination: page={}, size={}",
+				pageable.getPageNumber(), pageable.getPageSize());
+		return mainIssueService.getAllMainIssues(pageable);
 	}
 
 	@Operation(

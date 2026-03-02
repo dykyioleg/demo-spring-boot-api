@@ -10,6 +10,8 @@ import com.example.demo.repositories.MainIssueRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,8 @@ public class MainIssueServiceImpl implements MainIssueService {
     private static final String LOG_DELETING_MAIN_ISSUE = "Deleting main issue with id: {}";
     private static final String LOG_DELETING_RELATED_DEFECTS = "Deleting {} related defects for main issue id: {}";
     private static final String LOG_DELETED_MAIN_ISSUE = "Successfully deleted main issue with id: {}";
+    private static final String LOG_RETRIEVING_ALL_MAIN_ISSUES = "Retrieving all main issues: page={}, size={}, sort={}";
+    private static final String LOG_RETRIEVED_ALL_MAIN_ISSUES = "Successfully retrieved {} main issues out of {} total";
 
     private final MainIssueRepository mainIssueRepository;
     private final MainIssueMapper mainIssueMapper;
@@ -94,5 +98,16 @@ public class MainIssueServiceImpl implements MainIssueService {
         // Delete the main issue
         mainIssueRepository.delete(mainIssue);
         log.info(LOG_DELETED_MAIN_ISSUE, mainIssueId);
+    }
+
+    @Override
+    public Page<MainIssueRespDto> getAllMainIssues(final Pageable pageable) {
+        log.info(LOG_RETRIEVING_ALL_MAIN_ISSUES, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
+
+        Page<MainIssueEntity> mainIssuePage = mainIssueRepository.findAll(pageable);
+
+        log.info(LOG_RETRIEVED_ALL_MAIN_ISSUES, mainIssuePage.getNumberOfElements(), mainIssuePage.getTotalElements());
+
+        return mainIssuePage.map(mainIssueMapper::toDto);
     }
 }
