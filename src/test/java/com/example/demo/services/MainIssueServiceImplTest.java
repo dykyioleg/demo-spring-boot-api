@@ -4,6 +4,7 @@ import com.example.demo.dto.req.MainIssueReqDto;
 import com.example.demo.dto.resp.MainIssueRespDto;
 import com.example.demo.entities.MainIssueEntity;
 import com.example.demo.mappers.MainIssueMapper;
+import com.example.demo.repositories.DefectRepository;
 import com.example.demo.repositories.MainIssueRepository;
 import com.example.demo.util.MockBeanGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,10 +29,13 @@ class MainIssueServiceImplTest {
     @Mock
     private MainIssueRepository mainIssueRepository;
 
+    @Mock
+    private DefectRepository defectRepository;
+
     @BeforeEach
     void setUp() {
         final MainIssueMapper mainIssueMapper = Mappers.getMapper(MainIssueMapper.class);
-        mainIssueService = new MainIssueServiceImpl(mainIssueRepository, mainIssueMapper);
+        mainIssueService = new MainIssueServiceImpl(mainIssueRepository, mainIssueMapper, defectRepository);
     }
 
     @Test

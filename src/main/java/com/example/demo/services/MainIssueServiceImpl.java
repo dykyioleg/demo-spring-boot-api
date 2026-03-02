@@ -2,8 +2,10 @@ package com.example.demo.services;
 
 import com.example.demo.dto.req.MainIssueReqDto;
 import com.example.demo.dto.resp.MainIssueRespDto;
+import com.example.demo.entities.DefectEntity;
 import com.example.demo.entities.MainIssueEntity;
 import com.example.demo.mappers.MainIssueMapper;
+import com.example.demo.repositories.DefectRepository;
 import com.example.demo.repositories.MainIssueRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -28,9 +31,13 @@ public class MainIssueServiceImpl implements MainIssueService {
     private static final String LOG_RETRIEVING_MAIN_ISSUE = "Retrieving main issue with id: {}";
     private static final String LOG_RETRIEVED_MAIN_ISSUE = "Successfully retrieved main issue with id: {}";
     private static final String LOG_MAIN_ISSUE_NOT_FOUND = "Main issue not found with id: {}";
+    private static final String LOG_DELETING_MAIN_ISSUE = "Deleting main issue with id: {}";
+    private static final String LOG_DELETING_RELATED_DEFECTS = "Deleting {} related defects for main issue id: {}";
+    private static final String LOG_DELETED_MAIN_ISSUE = "Successfully deleted main issue with id: {}";
 
     private final MainIssueRepository mainIssueRepository;
     private final MainIssueMapper mainIssueMapper;
+    private final DefectRepository defectRepository;
 
     @Override
     @Transactional(readOnly = false)
@@ -63,5 +70,29 @@ public class MainIssueServiceImpl implements MainIssueService {
                 });
         log.debug(LOG_RETRIEVED_MAIN_ISSUE, mainIssueId);
         return mainIssueMapper.toDto(mainIssue);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMainIssue(final UUID mainIssueId) {
+        log.info(LOG_DELETING_MAIN_ISSUE, mainIssueId);
+
+        // Verify main issue exists
+        final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
+                .orElseThrow(() -> {
+                    log.warn(LOG_MAIN_ISSUE_NOT_FOUND, mainIssueId);
+                    return new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE);
+                });
+
+        // Find and delete all related defects first
+        final List<DefectEntity> relatedDefects = defectRepository.findByMainIssueId(mainIssueId);
+        if (!relatedDefects.isEmpty()) {
+            log.info(LOG_DELETING_RELATED_DEFECTS, relatedDefects.size(), mainIssueId);
+            defectRepository.deleteAll(relatedDefects);
+        }
+
+        // Delete the main issue
+        mainIssueRepository.delete(mainIssue);
+        log.info(LOG_DELETED_MAIN_ISSUE, mainIssueId);
     }
 }

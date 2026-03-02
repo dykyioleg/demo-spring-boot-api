@@ -2,7 +2,9 @@ package com.example.demo.rest;
 
 import com.example.demo.DemoApplication;
 import com.example.demo.TestcontainersConfiguration;
+import com.example.demo.entities.DefectEntity;
 import com.example.demo.entities.MainIssueEntity;
+import com.example.demo.repositories.DefectRepository;
 import com.example.demo.repositories.MainIssueRepository;
 import com.example.demo.testdata.DataFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,12 +20,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,6 +43,9 @@ public class MainIssueControllerTestIT {
 
     @Autowired
     private MainIssueRepository mainIssueRepository;
+
+    @Autowired
+    private DefectRepository defectRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -124,6 +131,67 @@ public class MainIssueControllerTestIT {
 
         //when
         this.mockMvc.perform(get("/api/main-issue/{mainIssueId}", nonExistentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteMainIssue() throws Exception {
+        //given
+        MainIssueEntity mainIssue = dataFixture.mainIssue.givenMainIssue("main issue to delete", true);
+
+        //when
+        this.mockMvc.perform(delete("/api/main-issue/{mainIssueId}", mainIssue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isNoContent());
+
+        Optional<MainIssueEntity> deletedMainIssue = mainIssueRepository.findById(mainIssue.getId());
+        assertThat(deletedMainIssue).isEmpty();
+    }
+
+    @Test
+    void deleteMainIssue_withRelatedDefects() throws Exception {
+        //given
+        MainIssueEntity mainIssue = dataFixture.mainIssue.givenMainIssue("main issue with defects", true);
+        DefectEntity defect1 = dataFixture.defect.givenDefect(mainIssue);
+        DefectEntity defect2 = dataFixture.defect.givenDefect(mainIssue);
+        DefectEntity defect3 = dataFixture.defect.givenDefect(mainIssue);
+
+        // Verify defects exist
+        assertThat(defectRepository.findByMainIssueId(mainIssue.getId())).hasSize(3);
+
+        //when
+        this.mockMvc.perform(delete("/api/main-issue/{mainIssueId}", mainIssue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isNoContent());
+
+        // Verify main issue is deleted
+        Optional<MainIssueEntity> deletedMainIssue = mainIssueRepository.findById(mainIssue.getId());
+        assertThat(deletedMainIssue).isEmpty();
+
+        // Verify all related defects are deleted
+        List<DefectEntity> remainingDefects = defectRepository.findByMainIssueId(mainIssue.getId());
+        assertThat(remainingDefects).isEmpty();
+
+        // Verify defects are actually deleted from DB
+        assertThat(defectRepository.findById(defect1.getId())).isEmpty();
+        assertThat(defectRepository.findById(defect2.getId())).isEmpty();
+        assertThat(defectRepository.findById(defect3.getId())).isEmpty();
+    }
+
+    @Test
+    void deleteMainIssue_notFound() throws Exception {
+        //given
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        //when
+        this.mockMvc.perform(delete("/api/main-issue/{mainIssueId}", nonExistentId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 // then

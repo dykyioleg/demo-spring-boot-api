@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -35,5 +36,12 @@ public class MainIssueRestController {
 	public MainIssueRespDto updateMainIssue(@PathVariable @NotNull final UUID mainIssueId, @Valid @RequestBody final MainIssueReqDto dto) {
 		log.info("Received PUT request to update main issue with id: {}", mainIssueId);
 		return mainIssueService.updateMainIssue(mainIssueId, dto);
+	}
+
+	@DeleteMapping("/{mainIssueId}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteMainIssue(@PathVariable @NotNull final UUID mainIssueId) {
+		log.info("Received DELETE request for main issue with id: {}", mainIssueId);
+		mainIssueService.deleteMainIssue(mainIssueId);
 	}
 }

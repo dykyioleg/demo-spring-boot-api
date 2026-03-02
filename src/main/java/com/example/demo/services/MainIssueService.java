@@ -13,4 +13,6 @@ public interface MainIssueService {
 
     MainIssueRespDto getMainIssueById(UUID mainIssueId);
 
+    void deleteMainIssue(UUID mainIssueId);
+
 }
