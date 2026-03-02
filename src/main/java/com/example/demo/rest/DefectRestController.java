@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -67,6 +68,27 @@ public class DefectRestController {
             @PathVariable @NotNull final UUID defectId) {
         log.info("Received GET request for defect with id: {}", defectId);
         return defectService.getDefectById(defectId);
+    }
+
+    @Operation(
+            summary = "Get Defects by Main Issue IDs",
+            description = "Retrieve all defects for specific main issues. " +
+                    "This endpoint demonstrates avoiding the N+1 query problem by using JOIN FETCH. " +
+                    "Instead of executing 1 query for defects + N queries for main issues, " +
+                    "it executes a single query that fetches both entities together. " +
+                    "Example: GET /api/defect/by-main-issues?mainIssueIds=id1&mainIssueIds=id2&mainIssueIds=id3"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of defects retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DefectRespDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid main issue IDs")
+    })
+    @GetMapping("/by-main-issues")
+    public List<DefectRespDto> getDefectsByMainIssueIds(
+            @Parameter(description = "List of main issue IDs to fetch defects for", required = true)
+            @RequestParam List<UUID> mainIssueIds) {
+        log.info("Received GET request for defects by {} main issue IDs (N+1 prevention)", mainIssueIds.size());
+        return defectService.getDefectsByMainIssueIds(mainIssueIds);
     }
 
     @Operation(

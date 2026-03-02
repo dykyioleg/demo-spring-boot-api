@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -104,5 +106,41 @@ public class DefectServiceImpl implements DefectService {
         defectRepository.delete(defect);
         log.info(LOG_DELETED_DEFECT, defectId);
     }
-}
 
+    /**
+     * Retrieves defects for specific main issues.
+     *
+     * This method demonstrates how to avoid the N+1 query problem:
+     * - Without JOIN FETCH: 1 query for defects IN (ids) + N queries for main issues (one per defect)
+     * - With JOIN FETCH: 1 single query that fetches both defects and main issues together
+     *
+     * Example scenario:
+     * - Input: [mainIssueId1, mainIssueId2, mainIssueId3]
+     * - Without optimization: 4 queries (1 for defects + 3 for each main issue)
+     * - With JOIN FETCH: 1 query only
+     *
+     * The repository uses @Query with JOIN FETCH to load the relationship eagerly.
+     *
+     * @param mainIssueIds List of main issue IDs to fetch defects for
+     * @return List of defects with their main issues loaded
+     */
+    @Override
+    public List<DefectRespDto> getDefectsByMainIssueIds(List<UUID> mainIssueIds) {
+        log.info("Retrieving defects for {} main issues (avoiding N+1 problem)", mainIssueIds.size());
+
+        if (mainIssueIds == null || mainIssueIds.isEmpty()) {
+            log.warn("Empty or null main issue IDs list provided");
+            return List.of();
+        }
+
+        // Single query with JOIN FETCH - no N+1 problem!
+        List<DefectEntity> defects = defectRepository.findByMainIssueIdIn(mainIssueIds);
+
+        log.info("Successfully retrieved {} defects for {} main issues in a single query",
+                defects.size(), mainIssueIds.size());
+
+        return defects.stream()
+                .map(defectMapper::toDto)
+                .collect(Collectors.toList());
+    }
+}
