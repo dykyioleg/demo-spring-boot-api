@@ -168,5 +168,81 @@ public class DefectControllerTestIT {
                 // then
                 .andExpect(status().isNotFound());
     }
-}
 
+    @Test
+    void getDefectsByMainIssueIds_shouldReturnDefectsForMultipleMainIssues() throws Exception {
+        // given - Create multiple main issues
+        MainIssueEntity mainIssue1 = dataFixture.mainIssue.givenMainIssue("Main Issue 1", true);
+        MainIssueEntity mainIssue2 = dataFixture.mainIssue.givenMainIssue("Main Issue 2", true);
+        MainIssueEntity mainIssue3 = dataFixture.mainIssue.givenMainIssue("Main Issue 3", false);
+
+        // Create defects for each main issue
+        DefectEntity defect1 = dataFixture.defect.givenDefect(mainIssue1);
+        DefectEntity defect2 = dataFixture.defect.givenDefect(mainIssue1); // Second defect for mainIssue1
+        DefectEntity defect3 = dataFixture.defect.givenDefect(mainIssue2);
+        DefectEntity defect4 = dataFixture.defect.givenDefect(mainIssue3);
+
+        testEntityManager.clear(); // Clear persistence context to ensure fresh query
+
+        // when - Call endpoint with multiple main issue IDs (testing N+1 prevention)
+        this.mockMvc.perform(get("/api/defect/by-main-issues")
+                        .param("mainIssueIds", mainIssue1.getId().toString())
+                        .param("mainIssueIds", mainIssue2.getId().toString())
+                        .param("mainIssueIds", mainIssue3.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(4)) // 4 defects total
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].mainIssueId").exists())
+                .andExpect(jsonPath("$[0].created").exists())
+                .andExpect(jsonPath("$[0].version").exists());
+
+        // Verify data in database
+        List<DefectEntity> foundDefects = defectRepository.findByMainIssueIdIn(
+                List.of(mainIssue1.getId(), mainIssue2.getId(), mainIssue3.getId()));
+        assertThat(foundDefects).hasSize(4);
+
+        // Verify all defects have their main issues loaded (no lazy loading exception)
+        foundDefects.forEach(defect -> {
+            assertThat(defect.getMainIssue()).isNotNull();
+            assertThat(defect.getMainIssue().getId()).isNotNull();
+        });
+    }
+
+    @Test
+    void getDefectsByMainIssueIds_shouldReturnEmptyListWhenNoDefectsFound() throws Exception {
+        // given - Create main issue without defects
+        MainIssueEntity mainIssue = dataFixture.mainIssue.givenMainIssue("Main Issue Without Defects", true);
+
+        // when
+        this.mockMvc.perform(get("/api/defect/by-main-issues")
+                        .param("mainIssueIds", mainIssue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void getDefectsByMainIssueIds_shouldHandleSingleMainIssueId() throws Exception {
+        // given
+        MainIssueEntity mainIssue = dataFixture.mainIssue.givenMainIssue("Single Main Issue", true);
+
+        DefectEntity defect1 = dataFixture.defect.givenDefect(mainIssue);
+        DefectEntity defect2 = dataFixture.defect.givenDefect(mainIssue);
+
+        // when
+        this.mockMvc.perform(get("/api/defect/by-main-issues")
+                        .param("mainIssueIds", mainIssue.getId().toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                // then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].mainIssueId").value(mainIssue.getId().toString()))
+                .andExpect(jsonPath("$[1].mainIssueId").value(mainIssue.getId().toString()));
+    }
+}

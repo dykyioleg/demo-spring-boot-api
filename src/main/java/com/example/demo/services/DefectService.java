@@ -16,12 +16,5 @@ public interface DefectService {
 
     void deleteDefect(UUID defectId);
 
-    /**
-     * Retrieve defects for specific main issues.
-     * Uses JOIN FETCH to avoid N+1 query problem.
-     *
-     * @param mainIssueIds List of main issue IDs to fetch defects for
-     * @return List of defects with eagerly loaded main issues
-     */
     List<DefectRespDto> getDefectsByMainIssueIds(List<UUID> mainIssueIds);
 }
