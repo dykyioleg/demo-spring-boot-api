@@ -26,24 +26,33 @@ public class MainIssueServiceImpl implements MainIssueService {
     @Override
     @Transactional(readOnly = false)
     public MainIssueRespDto saveMainIssue(final MainIssueReqDto mainIssueReqDto){
+        log.info("Saving new main issue with description: {}", mainIssueReqDto.getDescription());
         MainIssueEntity mainIssue = mainIssueMapper.toEntity(mainIssueReqDto);
         MainIssueEntity savedMainIssue = mainIssueRepository.saveAndFlush(mainIssue);
+        log.info("Successfully saved main issue with id: {}", savedMainIssue.getId());
         return mainIssueMapper.toDto(savedMainIssue);
     }
 
     @Override
     @Transactional(readOnly = false)
     public MainIssueRespDto updateMainIssue(final UUID mainIssueId, final MainIssueReqDto dto) {
+        log.info("Updating main issue with id: {}", mainIssueId);
         final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE));
         mainIssueMapper.updateEntityWithReqDto(dto, mainIssue);
+        log.info("Successfully updated main issue with id: {}", mainIssueId);
         return mainIssueMapper.toDto(mainIssue);
     }
 
     @Override
     public MainIssueRespDto getMainIssueById(final UUID mainIssueId) {
+        log.info("Retrieving main issue with id: {}", mainIssueId);
         final MainIssueEntity mainIssue = mainIssueRepository.findById(mainIssueId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE));
+                .orElseThrow(() -> {
+                    log.warn("Main issue not found with id: {}", mainIssueId);
+                    return new EntityNotFoundException(NOT_FOUND_MAIN_ISSUE);
+                });
+        log.debug("Successfully retrieved main issue with id: {}", mainIssueId);
         return mainIssueMapper.toDto(mainIssue);
     }
 }
