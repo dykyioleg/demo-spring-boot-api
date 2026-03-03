@@ -4,17 +4,19 @@ A Spring Boot REST API demonstrating CRUD operations, JWT authentication, and mo
 
 ## Features
 
-- ✅ RESTful API with CRUD operations for Main Issues and Defects
-- ✅ JWT Authentication with RSA signature validation
-- ✅ Method-level security using `@PreAuthorize`
-- ✅ OpenAPI/Swagger documentation
-- ✅ Cascade deletion (Main Issue → Defects)
-- ✅ Input validation with Jakarta Bean Validation
-- ✅ RFC 7807 Problem Details for errors
-- ✅ Integration tests with Testcontainers
-- ✅ MapStruct for DTO mapping
-- ✅ Liquibase for database migrations
+- RESTful API with CRUD operations for Main Issues and Defects
+- JWT Authentication with RSA signature validation
+- Method-level security using `@PreAuthorize`
+- OpenAPI/Swagger documentation
+- Cascade deletion (Main Issue → Defects)
+- Input validation with Jakarta Bean Validation
+- RFC 7807 Problem Details for errors
+- Integration tests with Testcontainers
+- MapStruct for DTO mapping
+- Liquibase for database migrations
+- External Service Integration Demo - Shows how to combine external HTTP API calls with database queries
 
+**For complete feature documentation, see [PROJECT_FEATURES.md](PROJECT_FEATURES.md)**
 ## Technology Stack
 
 - **Java**: 21
@@ -119,7 +121,7 @@ curl -X POST http://localhost:8080/api/main-issue \
 ./mvnw test -Dtest=MainIssueControllerTestIT
 ```
 
-**Test Results**: 15 tests, all passing ✓
+**Test Results**: 15 tests, all passing
 
 ## Project Structure
 
@@ -215,5 +217,5 @@ For questions or feedback, please contact the project maintainer.
 
 ---
 
-**Built with ❤️ using Spring Boot**
+**Built with Spring Boot**
 
