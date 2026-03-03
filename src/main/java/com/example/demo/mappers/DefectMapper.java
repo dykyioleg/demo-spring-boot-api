@@ -18,6 +18,7 @@ public interface DefectMapper {
     DefectEntity toEntity(DefectReqDto defectReqDto);
 
     @Mapping(target = "mainIssueId", source = "mainIssue.id")
+    @Mapping(target = "externalData", ignore = true)
     DefectRespDto toDto(DefectEntity defect);
 
     @Mapping(target = "version", ignore = true)
