@@ -1,5 +1,6 @@
 package com.example.demo.dto.resp;
 
+import com.example.demo.dto.external.ExternalDataDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -20,5 +21,8 @@ public class DefectRespDto {
 
     @Schema(description = "ID of the main issue this defect is associated with", example = "123e4567-e89b-12d3-a456-426614174000")
     private UUID mainIssueId;
+
+    @Schema(description = "Additional data from external service (null if service is unavailable or returns no data)")
+    private ExternalDataDto externalData;
 }
 

@@ -31,7 +31,7 @@ YAML: http://localhost:8080/api-docs.yaml
 ### Defect APIs:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/defect/{id}` | Get defect by ID |
+| GET | `/api/defect/{id}` | Get defect by ID (**DEMO**: includes external service call) |
 | POST | `/api/defect` | Create new defect |
 | PUT | `/api/defect/{id}` | Update defect |
 | DELETE | `/api/defect/{id}` | Delete defect |

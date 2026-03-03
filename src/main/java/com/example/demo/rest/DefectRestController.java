@@ -31,11 +31,17 @@ import java.util.UUID;
  *   <li>No authentication required for any operations</li>
  *   <li>Input validation using Jakarta Bean Validation</li>
  *   <li>RFC 7807 Problem Details for error responses</li>
+ *   <li><b>DEMO:</b> GET endpoint demonstrates calling external HTTP service first, then database</li>
  * </ul>
  * <p>
  * Base path: {@code /api/defect}
  * <p>
  * Note: Defects are automatically deleted when their parent main issue is deleted (cascade).
+ * <p>
+ * <b>External Service Integration (Demo):</b>
+ * The GET endpoint demonstrates a common pattern of enriching database data with external service data.
+ * If the external service is unavailable or returns an error, the externalData field will be null,
+ * but the database data will still be returned successfully.
  *
  * @see DefectService
  * @see DefectReqDto
@@ -54,7 +60,10 @@ public class DefectRestController {
 
     @Operation(
             summary = "Get Defect by ID",
-            description = "Retrieve a specific defect by its unique identifier"
+            description = "Retrieve a specific defect by its unique identifier. " +
+                    "DEMO: This endpoint demonstrates calling an external HTTP service first, then querying the database. " +
+                    "The flow is: 1) Call external service to get additional data (returns null if unavailable), " +
+                    "2) Fetch defect from database, 3) Combine both results in the response."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Defect found",

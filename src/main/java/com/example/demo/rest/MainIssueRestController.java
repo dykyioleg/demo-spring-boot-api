@@ -87,8 +87,7 @@ public class MainIssueRestController {
 	})
 	@GetMapping
 	public Page<MainIssueRespDto> getAllMainIssues(
-			@Parameter(description = "Pagination parameters (page, size, sort)",
-					example = "page=0&size=20&sort=created,desc")
+			@Parameter(description = "Pagination parameters (page, size, sort)", example = "page=0&size=20&sort=created,desc")
 			@PageableDefault(size = 20, sort = "created", direction = Sort.Direction.DESC)
 			Pageable pageable) {
 		log.info("Received GET request for all main issues with pagination: page={}, size={}",

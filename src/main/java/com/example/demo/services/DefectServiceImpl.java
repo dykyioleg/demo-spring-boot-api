@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.external.ExternalDataDto;
 import com.example.demo.dto.req.DefectReqDto;
 import com.example.demo.dto.resp.DefectRespDto;
 import com.example.demo.entities.DefectEntity;
@@ -40,6 +41,7 @@ public class DefectServiceImpl implements DefectService {
     private final DefectRepository defectRepository;
     private final MainIssueRepository mainIssueRepository;
     private final DefectMapper defectMapper;
+    private final ExternalServiceClient externalServiceClient;
 
     @Override
     @Transactional
@@ -85,13 +87,30 @@ public class DefectServiceImpl implements DefectService {
     @Override
     public DefectRespDto getDefectById(final UUID defectId) {
         log.info(LOG_RETRIEVING_DEFECT, defectId);
+
+        // First, call external service to get additional data
+        log.info("Fetching data from external service for demonstration purposes");
+        ExternalDataDto externalData = externalServiceClient.fetchExternalData();
+        if (externalData != null) {
+            log.info("External service returned data successfully");
+        } else {
+            log.info("External service returned null - will be included as null in response");
+        }
+
+        // Fetch defect from database
+        log.info("Fetching defect from database");
         final DefectEntity defect = defectRepository.findById(defectId)
                 .orElseThrow(() -> {
                     log.warn(LOG_DEFECT_NOT_FOUND, defectId);
                     return new EntityNotFoundException(NOT_FOUND_DEFECT);
                 });
         log.debug(LOG_RETRIEVED_DEFECT, defectId);
-        return defectMapper.toDto(defect);
+
+        DefectRespDto response = defectMapper.toDto(defect);
+        response.setExternalData(externalData);
+
+        log.info("Successfully retrieved defect {} with external data (null: {})", defectId, externalData == null);
+        return response;
     }
 
     @Override
