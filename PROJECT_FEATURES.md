@@ -32,8 +32,8 @@
 
 ## 7. Spring Data JPA
 - Repository pattern for data access
-- Custom query methods
-- Batch operations for performance
+- Custom query methods with @Query annotations
+- JOIN FETCH for efficient data loading
 
 ## 8. Entity Relationships
 - One-to-Many between Main Issue and Defects
@@ -75,62 +75,47 @@
 - Structured logging across all layers
 - Configurable log levels
 
-## 16. Configuration Management
-- Externalized properties in `application.properties`
-- Spring profiles support
-- Environment-specific configurations
-
-## 17. Maven Build System
+## 16. Maven Build System
 - Spring Boot Maven Plugin
 - Surefire for unit tests, Failsafe for integration tests
 - Annotation processors for Lombok and MapStruct
 
-## 18. Lombok Integration
+## 17. Lombok Integration
 - Reduced boilerplate with annotations
 - Generated getters, setters, constructors
 - Logger field generation
 
-## 19. Docker Support
+## 18. Docker Support
 - Dockerfile for containerization
 - Docker Compose with PostgreSQL
-- Multi-stage builds for optimization
+- Java 21 base image
 
-## 20. Security Configuration
+## 19. Security Configuration
 - Custom SecurityFilterChain
-- CORS and CSRF configuration
-- Selective endpoint protection
+- CSRF disabled for stateless REST API
+- Selective endpoint protection (Swagger/Actuator public)
 
-## 21. Cascade Operations
+## 20. Cascade Operations
 - Automatic deletion of child entities
 - JPA cascade configuration
 - Referential integrity maintenance
 
-## 22. Optimistic Locking
+## 21. Optimistic Locking
 - Version field on entities
 - Prevents lost updates in concurrent scenarios
 - Automatic version management
 
-## 23. UUID Primary Keys
-- Globally unique identifiers
-- Non-sequential for security
-- No database sequence dependencies
+## 22. N+1 Query Prevention
+- JOIN FETCH in custom queries
+- Efficient loading of defects with main issues
+- Performance optimization via @Query annotations
 
-## 24. Audit Fields
-- Created and modified timestamps
-- Managed in AbstractEntity base class
-- Automatic tracking of changes
-
-## 25. N+1 Query Prevention
-- Batch fetching to avoid multiple queries
-- Performance optimization in service layer
-- Efficient data loading strategies
-
-## 26. Virtual Threads (Java 21)
+## 23. Virtual Threads (Java 21)
 - Lightweight threads for high concurrency
 - Prevents thread starvation with blocking I/O
 - Automatic configuration via Spring Boot
 
-## 27. Distributed Tracing with Micrometer
+## 24. Distributed Tracing with Micrometer
 - Automatic trace ID generation for every HTTP request
 - MDC (Mapped Diagnostic Context) integration
 - Trace ID propagation to external services via HTTP headers
