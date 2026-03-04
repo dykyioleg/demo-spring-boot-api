@@ -46,6 +46,7 @@ class ExternalServiceClientTest {
 
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.header(eq("X-Trace-Id"), any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(ExternalDataDto.class)).thenReturn(Mono.just(expectedData));
 
@@ -58,12 +59,14 @@ class ExternalServiceClientTest {
 
         verify(webClient).get();
         verify(requestHeadersUriSpec).uri("/todos/1");
+        verify(requestHeadersSpec).header(eq("X-Trace-Id"), any());
     }
 
     @Test
     void fetchExternalData_ServiceUnavailable_ReturnsNull() {
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.header(eq("X-Trace-Id"), any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(ExternalDataDto.class)).thenReturn(Mono.error(new RuntimeException("Service unavailable")));
 
@@ -76,6 +79,7 @@ class ExternalServiceClientTest {
     void fetchExternalData_Timeout_ReturnsNull() {
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.header(eq("X-Trace-Id"), any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(ExternalDataDto.class))
                 .thenReturn(Mono.delay(Duration.ofSeconds(10)).map(i -> new ExternalDataDto()));

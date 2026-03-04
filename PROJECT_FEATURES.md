@@ -130,6 +130,25 @@
 - Prevents thread starvation with blocking I/O
 - Automatic configuration via Spring Boot
 
+## 27. Distributed Tracing with Micrometer
+- Automatic trace ID generation for every HTTP request
+- MDC (Mapped Diagnostic Context) integration
+- Trace ID propagation to external services via HTTP headers
+- Thread name and trace ID in console logs
+- Spring Boot Actuator for tracing infrastructure
+
+**Features:**
+- Unique trace ID per request for request tracking
+- Trace ID available in all log statements within a request
+- X-Trace-Id header propagation to external services (WebClient)
+- W3C Trace Context standard compliance
+- Ready for integration with Zipkin/Jaeger
+
+**Log Format:**
+```
+2026-03-04 11:30:20 [http-nio-8080-exec-1] [traceId:69a809bcf8ddea0559445d506bd09ed5] INFO c.e.demo.rest.DefectRestController - Received GET request
+```
+
 ---
 
 ## Technology Stack
@@ -160,6 +179,11 @@
 
 **HTTP Client**
 - Spring WebClient (synchronous mode)
+
+**Observability**
+- Micrometer Tracing (Brave)
+- Spring Boot Actuator
+- SLF4J/Logback with MDC
 
 **Testing**
 - JUnit 5

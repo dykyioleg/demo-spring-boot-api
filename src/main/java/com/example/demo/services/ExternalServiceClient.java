@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.dto.external.ExternalDataDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -40,10 +41,12 @@ public class ExternalServiceClient {
      */
     public ExternalDataDto fetchExternalData() {
         log.info("Attempting to fetch data from external service");
+        final String traceId = MDC.get("traceId");
 
         try {
             ExternalDataDto result = webClient.get()
                     .uri("/todos/1")
+                    .header("X-Trace-Id", traceId)
                     .retrieve()
                     .bodyToMono(ExternalDataDto.class)
                     .timeout(Duration.ofSeconds(5))
