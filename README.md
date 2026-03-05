@@ -193,15 +193,48 @@ jwt.public-key=<RSA_PUBLIC_KEY>
 
 ## Docker Support
 
-### Build Docker image
+### Quick Start with Docker Compose
+
+The easiest way to run the application is using Docker Compose, which starts both the application and PostgreSQL:
+
 ```bash
-docker build -t demo-api .
+# Build the JAR file first
+./mvnw clean package -DskipTests
+
+# Build and start both services (app + database)
+docker compose up -d
+
+# View logs
+docker compose logs -f app
+
+# Stop services
+docker compose down
 ```
 
-### Run with Docker Compose
+The application will be available at:
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui.html
+
+### Manual Docker Build
+
+If you prefer to build and run the Docker image manually:
+
 ```bash
-docker-compose up
+# Build the JAR
+./mvnw clean package -DskipTests
+
+# Build Docker image
+docker build -t demo-api .
+
+# Run with environment variables (database must be running)
+docker run -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/demo?schema=demo \
+  -e SPRING_DATASOURCE_USERNAME=postgres \
+  -e SPRING_DATASOURCE_PASSWORD=XlQIppEarQ6 \
+  demo-api
 ```
+
+**Note**: The application uses environment variables to configure the database connection, allowing it to work both locally and in Docker containers.
 
 ## Contributing
 
