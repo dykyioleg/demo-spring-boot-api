@@ -145,6 +145,8 @@ public class MainIssueRestController {
 			)
 			@Valid @RequestBody final MainIssueReqDto dto) {
 		log.info("Received PUT request to update main issue with id: {}", mainIssueId);
+		Thread currentThread = Thread.currentThread();
+		log.info("Updating main issue - Current thread name: {}, Virtual: {}", currentThread.getName(), currentThread.isVirtual());
 		return mainIssueService.updateMainIssue(mainIssueId, dto);
 	}
 

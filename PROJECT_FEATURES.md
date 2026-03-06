@@ -4,6 +4,7 @@
 - RESTful endpoints for Main Issues and Defects
 - CRUD operations with proper HTTP methods
 - JSON request/response format
+- Pagination support for Main Issues with customizable page size and sorting
 
 ## 2. OpenAPI/Swagger Documentation
 - Interactive API documentation at `/swagger-ui.html`
@@ -35,87 +36,94 @@
 - Custom query methods with @Query annotations
 - JOIN FETCH for efficient data loading
 
-## 8. Entity Relationships
+## 8. Pagination and Sorting
+- Spring Data Pageable support for Main Issues endpoint
+- Customizable page size and page number
+- Multi-field sorting with direction control (ASC/DESC)
+- Default configuration: 20 items per page, sorted by creation date descending
+- Example: `GET /api/main-issue?page=0&size=10&sort=created,desc`
+
+## 9. Entity Relationships
 - One-to-Many between Main Issue and Defects
 - Cascade operations for referential integrity
 - Abstract base entity with common fields
 
-## 9. DTO Pattern with MapStruct
+## 10. DTO Pattern with MapStruct
 - Separation between entities and DTOs
 - Automatic mapping at compile-time
 - Clean API contracts
 
-## 10. Error Handling
+## 11. Error Handling
 - RFC 7807 Problem Details standard
 - Custom exception handling
 - Proper HTTP status codes
 
-## 11. Integration Testing
+## 12. Integration Testing
 - Testcontainers for isolated PostgreSQL
 - Full Spring context tests
 - Real database and HTTP endpoint testing
 
-## 12. Unit Testing
+## 13. Unit Testing
 - JUnit 5 with Mockito
 - Service layer tests with mocked dependencies
 - Fast isolated tests
 
-## 13. Code Coverage
+## 14. Code Coverage
 - JaCoCo integration
 - HTML coverage reports in `target/site/jacoco/`
 - Metrics per class and package
 
-## 14. External Service Integration
+## 15. External Service Integration
 - WebClient for HTTP calls (used synchronously)
 - Timeout protection and graceful error handling
 - Demo endpoint combining external and database data
 
-## 15. Logging
+## 16. Logging
 - SLF4J with Logback
 - Structured logging across all layers
 - Configurable log levels
 
-## 16. Maven Build System
+## 17. Maven Build System
 - Spring Boot Maven Plugin
 - Surefire for unit tests, Failsafe for integration tests
 - Annotation processors for Lombok and MapStruct
 
-## 17. Lombok Integration
+## 18. Lombok Integration
 - Reduced boilerplate with annotations
 - Generated getters, setters, constructors
 - Logger field generation
 
-## 18. Docker Support
+## 19. Docker Support
 - Dockerfile for containerization
 - Docker Compose with PostgreSQL
 - Java 21 base image
 
-## 19. Security Configuration
+## 20. Security Configuration
 - Custom SecurityFilterChain
 - CSRF disabled for stateless REST API
 - Selective endpoint protection (Swagger/Actuator public)
 
-## 20. Cascade Operations
+## 21. Cascade Operations
 - Automatic deletion of child entities
 - JPA cascade configuration
 - Referential integrity maintenance
 
-## 21. Optimistic Locking
+## 22. Optimistic Locking
 - Version field on entities
 - Prevents lost updates in concurrent scenarios
 - Automatic version management
 
-## 22. N+1 Query Prevention
+## 23. N+1 Query Prevention
 - JOIN FETCH in custom queries
 - Efficient loading of defects with main issues
 - Performance optimization via @Query annotations
 
-## 23. Virtual Threads (Java 21)
+## 24. Virtual Threads (Java 21)
 - Lightweight threads for high concurrency
 - Prevents thread starvation with blocking I/O
 - Automatic configuration via Spring Boot
 
-## 24. Distributed Tracing with Micrometer
+## 25. Distributed Tracing with Micrometer
 - Automatic trace ID generation for every HTTP request
 - MDC (Mapped Diagnostic Context) integration
 - Trace ID propagation to external services via HTTP headers
