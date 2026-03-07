@@ -1,0 +1,114 @@
+# GitLab CI/CD Pipeline
+#
+# Required GitLab CI/CD Variables (Settings → CI/CD → Variables):
+#   - SONAR_HOST_URL: SonarQube server URL
+#   - SONAR_TOKEN: SonarQube authentication token
+#   - ECR_REGISTRY: AWS ECR registry URL (e.g., 123456789012.dkr.ecr.us-east-1.amazonaws.com)
+#   - ECR_REPOSITORY: ECR repository name (e.g., demo-api)
+#   - AWS_ACCESS_KEY_ID: AWS IAM access key for ECR push
+#   - AWS_SECRET_ACCESS_KEY: AWS IAM secret key for ECR push (mark as Protected & Masked)
+#   - K8S_PROJECT_PATH: GitLab project path for K8s deployment (e.g., group/k8s-deploy)
+
+stages:
+  - test
+  - sonar
+  - build
+  - docker
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  IMAGE_TAG: "${CI_COMMIT_SHORT_SHA}"
+
+cache:
+  paths:
+    - .m2/repository
+
+###############################
+# TEST
+###############################
+test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-21
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - ./mvnw clean verify
+  artifacts:
+    when: always
+    paths:
+      - target/surefire-reports/
+      - target/failsafe-reports/
+      - target/site/jacoco/
+      - target/classes/
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+    expire_in: 1 week
+
+###############################
+# SONAR
+###############################
+sonar:
+  stage: sonar
+  image: eclipse-temurin:21-jdk
+  dependencies:
+    - test
+  script:
+    - ./mvnw sonar:sonar
+
+###############################
+# BUILD JAR
+###############################
+build:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - ./mvnw package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+    expire_in: 1 week
+
+###############################
+# DOCKER BUILD & PUSH TO AWS ECR
+###############################
+docker:
+  stage: docker
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: [""]
+  dependencies:
+    - build
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"credsStore\":\"ecr-login\"}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --context "${CI_PROJECT_DIR}"
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+        --destination "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+        --destination "${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
+  only:
+    - main
+    - develop
+
+###############################
+# TRIGGER K8S DEPLOYMENT
+###############################
+deploy:
+  stage: deploy
+  trigger:
+    project: ${K8S_PROJECT_PATH}
+    strategy: depend
+  variables:
+    IMAGE_TAG: ${IMAGE_TAG}
+    ENVIRONMENT: ${CI_COMMIT_REF_NAME}
+  only:
+    - main
+    - develop
+
+

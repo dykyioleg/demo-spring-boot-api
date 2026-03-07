@@ -166,6 +166,23 @@ jwt.public-key=<RSA_PUBLIC_KEY>
 
 - **API_DOCS.md** - Complete API documentation
 
+## CI/CD Pipeline
+
+This project includes a GitLab CI/CD pipeline (`.gitlab-ci.yml`) with the following stages:
+
+1. **test** - Run unit and integration tests with Testcontainers (DinD), generate JaCoCo coverage
+2. **sonar** - Code quality analysis with SonarQube
+3. **build** - Build production JAR file
+4. **docker** - Build and push Docker image to AWS ECR using Kaniko
+5. **deploy** - Trigger downstream Kubernetes deployment project
+
+### Required GitLab CI/CD Variables
+
+Configure these in **Settings → CI/CD → Variables**:
+- `SONAR_HOST_URL`, `SONAR_TOKEN` - SonarQube configuration
+- `ECR_REGISTRY`, `ECR_REPOSITORY` - AWS ECR details (e.g., `123456789012.dkr.ecr.us-east-1.amazonaws.com`, `demo-api`)
+- `K8S_PROJECT_ID`, `K8S_TRIGGER_TOKEN` - Downstream K8s deployment project
+
 ## Security Architecture
 
 - **HTTP-level**: All `/api/**` endpoints permitted
